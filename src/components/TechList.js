@@ -1,14 +1,17 @@
 import React from 'react';
 import { Component } from 'react';
+import TechItem from './TechItem';
 
 class TechList extends Component {
+
+  // Should be another way, but doesn't work
+  // static defaultProps = {
+  //   tech: 'Oculto',
+  // };
+
   state = {
     newTech: '',
-    techs: [
-      'Node.js',
-      'React.js',
-      'React Native'
-    ]
+    techs: []
   };
 
   handleInputChange = e => {
@@ -26,13 +29,48 @@ class TechList extends Component {
       newTech: ''
     });
   }
-  
+
+  handleDelete = (tech) => {
+    this.setState({
+      techs: this.state.techs.filter(t=> t !== tech)
+    });
+  }
+
+  // Life Cycle
+  // When it appears on the 'screen'
+  componentDidMount() {
+    const techs = localStorage.getItem('techs');
+
+    if (techs) {
+      this.setState({ techs: JSON.parse(techs)});
+    }
+
+  }
+
+  // When something changes
+  componentDidUpdate(_, prevState) { // prevProps, prevState
+    if (prevState.techs !== this.setState.techs) {
+      localStorage.setItem('techs', JSON.stringify(this.state.techs))
+    }
+  }
+
+  // When it is going to be removed
+  componentWillUnmount() {
+
+  }
+
   render() {
     return(
       <form onSubmit={this.handleSubmit}>
       <h1>{this.state.newTech}</h1>
-      <ul>
-        {this.state.techs.map(tech => <li key={tech}>{tech}</li>)}
+      <ul>        
+        {this.state.techs.map(tech => (
+          <TechItem 
+            key={tech} 
+            tech={tech} 
+            onDelete={() => this.handleDelete(tech)}
+          />
+        ))}
       </ul>
       <input 
         type="text" 
